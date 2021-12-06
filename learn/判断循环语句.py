@@ -101,3 +101,7 @@ for i in range(0, 10, 1):
     if i == 7 or i == 8:
         pass  # 啥都不做不知道啥用估计和空函数差不多
     print(i, end='\t')
+
+# 循环获取index
+for index, value in enumerate(['kk1', 'kk2']):
+    print(index)

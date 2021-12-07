@@ -19,8 +19,11 @@ options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 防
 # 实例化一个浏览器对象
 browser = webdriver.Chrome(executable_path='../scrapy/middleware_demo/middleware_demo/chromedriver.exe', options=options)
 
-browser.get('https://javdb30.com/tags?c5=123&c10=1')
+url = 'https://suumo.jp/jj/chintai/ichiran/FR301FC005/?ar=030&bs=040&ra=013&rn=0065&ek=006534520&cb=0.0&ct=5.0&mb=0&mt=9999999&et=9999999&cn=9999999&shkr1=03&shkr2=03&shkr3=03&shkr4=03&sngz=&po1=25&po2=99&pc=10&page='
+
+browser.get(url)
 time.sleep(1)
+
 browser.find_element_by_xpath('/html/body/div[1]/div[2]/footer/a[1]').click()
 # 搜索框中输入字符串
 browser.find_element_by_id('video-search').send_keys('三宮つばき')

@@ -20,7 +20,7 @@ options.add_argument("--disable-gpu")
 # 伪造请求 防止selenium 被监测到
 options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 防止网站识别Selenium代码
 
-browser = webdriver.Chrome(service=Service("../chromedriver_office.exe"), options=options)
+browser = webdriver.Chrome(service=Service("../chromedriver.exe"), options=options)
 
 browser.implicitly_wait(3)
 

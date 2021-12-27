@@ -16,11 +16,14 @@ options = webdriver.ChromeOptions()
 # 不打开浏览器
 options.add_argument('--headless')
 options.add_argument("--disable-gpu")
+options.add_argument('--no-sandbox') # 一定要加不然linux里面出错
+options.add_argument('--disable-extensions')
+
 # options.add_argument('--blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
 # 伪造请求 防止selenium 被监测到
 options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 防止网站识别Selenium代码
 
-browser = webdriver.Chrome(service=Service("../chromedriver_office.exe"), options=options)
+browser = webdriver.Chrome(executable_path="../chromedriver.exe",options=options)
 
 browser.implicitly_wait(3)
 
@@ -245,16 +248,16 @@ def getData(param):
                 # 插入house 表
                 cursor.execute("update house set vr_image='%s',map_longitude='%s',map_latitude='%s' where id=%d" % (
                     vr_image, map_longitude, map_latitude, house_id))
-                db.commit()
                 # print(title, price, management_price, gift_price, deposit, room, area, direction,
                 #       classify, age, walk_time, location, vr_image, vr_link, room_decoration,
                 #       detail_room, build_material, floor, build_date, depreciation, car_park, check_in,requirement,
                 #       total_house, house_update, duration, commission, company_price, total_price,
                 #       other_price, remarks, map_longitude, map_latitude,summo_link)
         except Exception as e:
-            print(e.with_traceback())
+            print(e.with_traceback)
             pass
         continue
+
 
 
 if __name__ == '__main__':
@@ -265,7 +268,11 @@ if __name__ == '__main__':
 
     params = {
     }
-    page = 8
-    while page < 100:
+    page = 1
+    while page < 10:
         getData(url + (str(page)))
         page += 1
+    cursor.close()
+    db.commit()
+    db.close()
+    browser.close()

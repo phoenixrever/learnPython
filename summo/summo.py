@@ -7,16 +7,15 @@ from requests.adapters import HTTPAdapter
 import urllib.parse
 import pymysql
 
-
-
 my_request = requests.Session()
 my_request.mount('http://', HTTPAdapter(max_retries=5))
 my_request.mount('https://', HTTPAdapter(max_retries=5))
 
 
 def getData(url):
-    text = my_request.get(url, headers=headers, proxies=proxies, timeout=5, ).text
-    tree = etree.HTML(text)
+    myparser =etree.HTMLParser(encoding="utf-8")
+    text = my_request.get(url, headers=headers, timeout=5, ).text
+    tree = etree.HTML(text,parser=myparser)
     groups = tree.xpath('//div[@class="property_group"]')
     for item in groups:
         try:
@@ -29,11 +28,11 @@ def getData(url):
                 time.sleep(2)
                 url_detail = 'https://suumo.jp' + hrefs[i]
                 print(url_detail)
-                detail_text = my_request.get(url_detail, proxies=proxies, headers=headers,timeout=5).text
+                detail_text = my_request.get(url_detail, headers=headers, timeout=5).text
                 time.sleep(5)
-                detail_tree = etree.HTML(detail_text)
+                detail_tree = etree.HTML(detail_text,parser=myparser)
                 title = detail_tree.xpath('//*[@class="section_h1-header-title"]/text()')
-                if len(title)>0:
+                if len(title) > 0:
                     title = title[0].strip()
                 # 是否是重复数据
                 select_sql = "select * from house where title = '%s'" % (title)
@@ -191,10 +190,10 @@ def getData(url):
                 # =================  周辺環境表 里面有地图 经纬度===================
                 nearUrl = detail_tree.xpath('//*[@class="data_around"]//a/@href')[0].strip()
                 print('https://suumo.jp' + nearUrl)
-                near_text = my_request.get('https://suumo.jp' + nearUrl, headers=headers, proxies=proxies,
+                near_text = my_request.get('https://suumo.jp' + nearUrl, headers=headers,
                                            timeout=5).text
                 time.sleep(5)
-                nearTree = etree.HTML(near_text)
+                nearTree = etree.HTML(near_text,parser=myparser)
 
                 # 地图
                 map_longitude = ''
@@ -241,15 +240,18 @@ if __name__ == '__main__':
     # db = pymysql.connect(host='192.168.56.100', user='root', password='root', database='summo')
     # db = pymysql.connect(host='localhost', user='root', password='159629zxc', database='summo')
     db = pymysql.connect(host='172.31.42.42', user='root', password='123456', database='summo')
+    db.set_charset("utf8")
     cursor = db.cursor()
+    cursor.execute('SET NAMES utf8;')
+    cursor.execute('SET CHARACTER SET utf8;')
+    cursor.execute('SET character_set_connection=utf8;')
     url = 'https://suumo.jp/jj/chintai/ichiran/FR301FC005/?ar=030&bs=040&ra=013&rn=0065&ek=006534520&cb=0.0&ct=5.0&mb=0&mt=9999999&et=9999999&cn=9999999&shkr1=03&shkr2=03&shkr3=03&shkr4=03&sngz=&po1=25&po2=99&pc=10&page='
 
     headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36'
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
+        'Content-type': 'text/plain; charset=utf-8'
     }
-    # params = {
-    # }
-    proxies = {'http': '127.0.0.1:10808'}
+
     page = 1
     while page < 5:
         getData(url + (str(page)))

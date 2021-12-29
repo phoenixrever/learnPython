@@ -248,6 +248,7 @@ def getData(param):
                 # 插入house 表
                 cursor.execute("update house set vr_image='%s',map_longitude='%s',map_latitude='%s' where id=%d" % (
                     vr_image, map_longitude, map_latitude, house_id))
+                db.commit()
                 # print(title, price, management_price, gift_price, deposit, room, area, direction,
                 #       classify, age, walk_time, location, vr_image, vr_link, room_decoration,
                 #       detail_room, build_material, floor, build_date, depreciation, car_park, check_in,requirement,
@@ -273,6 +274,5 @@ if __name__ == '__main__':
         getData(url + (str(page)))
         page += 1
     cursor.close()
-    db.commit()
     db.close()
     browser.close()

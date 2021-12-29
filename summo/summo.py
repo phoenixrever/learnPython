@@ -7,6 +7,8 @@ from requests.adapters import HTTPAdapter
 import urllib.parse
 import pymysql
 
+
+
 my_request = requests.Session()
 my_request.mount('http://', HTTPAdapter(max_retries=5))
 my_request.mount('https://', HTTPAdapter(max_retries=5))
@@ -21,14 +23,14 @@ def getData(url):
             # .// 表示当前节点下的元素
             # names = item.xpath('.//*[@class="property_inner-title"]/a/text()')
             hrefs = item.xpath('.//a[@class="js-cassetLinkHref"]/@href')
-            # print(hrefs)
+            print(hrefs)
             # 详情页发送请求
             for i in range(0, len(hrefs)):
                 time.sleep(2)
                 url_detail = 'https://suumo.jp' + hrefs[i]
                 print(url_detail)
-                detail_text = my_request.get(url_detail, proxies=proxies, headers=headers).text
-                time.sleep(1)
+                detail_text = my_request.get(url_detail, proxies=proxies, headers=headers,timeout=5).text
+                time.sleep(5)
                 detail_tree = etree.HTML(detail_text)
                 title = detail_tree.xpath('//*[@class="section_h1-header-title"]/text()')
                 if len(title)>0:
@@ -39,8 +41,8 @@ def getData(url):
                 cursor.execute(select_sql)
                 results = cursor.fetchall()
                 if (len(results) > 0):
-                    #     exit(0)
-                    continue
+                    exit(0)
+                    # continue
 
                 price = detail_tree.xpath(
                     '//*[@id="js-view_gallery"]/div[1]/div[2]/div[2]/div/div[2]/div/div[1]/div/div[1]/text()')[
@@ -191,7 +193,7 @@ def getData(url):
                 print('https://suumo.jp' + nearUrl)
                 near_text = my_request.get('https://suumo.jp' + nearUrl, headers=headers, proxies=proxies,
                                            timeout=5).text
-                time.sleep(1)
+                time.sleep(5)
                 nearTree = etree.HTML(near_text)
 
                 # 地图
@@ -230,14 +232,15 @@ def getData(url):
                 #       total_house, house_update, duration, commission, company_price, total_price,
                 #       other_price, remarks, map_longitude, map_latitude)
         except Exception as e:
-            print(e.with_traceback())
+            print(e.with_traceback)
             pass
         continue
 
 
 if __name__ == '__main__':
     # db = pymysql.connect(host='192.168.56.100', user='root', password='root', database='summo')
-    db = pymysql.connect(host='localhost', user='root', password='159629zxc', database='summo')
+    # db = pymysql.connect(host='localhost', user='root', password='159629zxc', database='summo')
+    db = pymysql.connect(host='172.31.42.42', user='root', password='123456', database='summo')
     cursor = db.cursor()
     url = 'https://suumo.jp/jj/chintai/ichiran/FR301FC005/?ar=030&bs=040&ra=013&rn=0065&ek=006534520&cb=0.0&ct=5.0&mb=0&mt=9999999&et=9999999&cn=9999999&shkr1=03&shkr2=03&shkr3=03&shkr4=03&sngz=&po1=25&po2=99&pc=10&page='
 
@@ -248,7 +251,8 @@ if __name__ == '__main__':
     # }
     proxies = {'http': '127.0.0.1:10808'}
     page = 1
-    getData(url)
-    # while page < 3:
-    #     getData(url+ (str(page)))
-    #     page += 1
+    while page < 5:
+        getData(url + (str(page)))
+        page += 1
+    cursor.close()
+    db.close()

@@ -28,6 +28,7 @@ def getData(url):
                 time.sleep(2)
                 url_detail = 'https://suumo.jp' + hrefs[i]
                 print(url_detail)
+                summo_link = url_detail
                 detail_text = my_request.get(url_detail, headers=headers, timeout=5).text
                 time.sleep(5)
                 detail_tree = etree.HTML(detail_text,parser=myparser)
@@ -71,6 +72,7 @@ def getData(url):
                 age = detail_tree.xpath(
                     '//*[@id="js-view_gallery"]/div[1]/div[2]/div[3]/div[1]/div/div[2]/ul/li[5]/div/div[2]/text()')[
                     0].strip()
+
                 access = detail_tree.xpath(
                     '//*[@id="js-view_gallery"]/div[1]/div[2]/div[3]/div[2]/div[1]/div/div[2]//text()')
                 access_list = []
@@ -153,16 +155,16 @@ def getData(url):
                     vr_link = iframe[0].strip()
                 # 数据库插入数据
                 house_sql = "insert into house(title, price, management_price, gift_price, deposit, room, area," \
-                            "direction,classify, age, walk_time, location, vr_image, vr_link, room_decoration," \
+                            "direction,classify, age, walk_time, summo_link,location, vr_image, vr_link, room_decoration," \
                             "detail_room, build_material, floor, build_date, depreciation, car_park, check_in," \
                             "requirement,total_house, house_update,duration, commission, company_price, " \
                             "total_price,other_price, remarks)" \
-                            " values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+                            " values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
                                 title, price, management_price, gift_price, deposit, room, area, direction, classify,
-                                age, walk_time,
+                                age, walk_time,summo_link,
                                 location, vr_image, vr_link, room_decoration, detail_room, build_material, floor,
                                 build_date,
-                                depreciation, car_park, check_in, requirement, total_house, house_update, duration,
+                                depreciation, car_park, check_in.strip("'"), requirement, total_house, house_update, duration,
                                 commission,
                                 company_price, total_price, other_price, remarks)
                 print(house_sql)
@@ -232,14 +234,15 @@ def getData(url):
                 #       other_price, remarks, map_longitude, map_latitude)
         except Exception as e:
             print(e.with_traceback)
-            pass
-        continue
+            cursor.close()
+            db.close()
+            exit(0)
 
 
 if __name__ == '__main__':
     # db = pymysql.connect(host='192.168.56.100', user='root', password='root', database='summo')
-    # db = pymysql.connect(host='localhost', user='root', password='159629zxc', database='summo')
-    db = pymysql.connect(host='172.31.42.42', user='root', password='123456', database='summo')
+    db = pymysql.connect(host='localhost', user='root', password='159629zxc', database='summo')
+    # db = pymysql.connect(host='172.31.42.42', user='root', password='123456', database='summo')
     db.set_charset("utf8")
     cursor = db.cursor()
     cursor.execute('SET NAMES utf8;')

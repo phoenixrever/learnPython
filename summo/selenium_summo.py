@@ -7,7 +7,6 @@ from lxml import etree
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 
-
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -16,16 +15,17 @@ options = webdriver.ChromeOptions()
 # 不打开浏览器
 options.add_argument('--headless')
 options.add_argument("--disable-gpu")
-options.add_argument('--no-sandbox') # 一定要加不然linux里面出错
+options.add_argument('--no-sandbox')  # 一定要加不然linux里面出错
 options.add_argument('--disable-extensions')
 
 # options.add_argument('--blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
 # 伪造请求 防止selenium 被监测到
 options.add_experimental_option('excludeSwitches', ['enable-automation'])  # 防止网站识别Selenium代码
 
-browser = webdriver.Chrome(executable_path="../chromedriver.exe",options=options)
+browser = webdriver.Chrome(executable_path="../chromedriver.exe", options=options)
 
 browser.implicitly_wait(3)
+
 
 # WebDriverWait(browser, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'section_h1-header-title')))
 # WebDriverWait(browser, 3).until_not(EC.presence_of_element_located((By.ID, 'wrapper1')))
@@ -54,7 +54,7 @@ def getData(param):
                 time.sleep(2)
                 url_detail = 'https://suumo.jp' + hrefs[i]
                 print(url_detail)
-                summo_link=url_detail
+                summo_link = url_detail
                 detail_tree = my_request(url_detail)
                 title = detail_tree.xpath('//*[@class="section_h1-header-title"]/text()')
                 if len(title) > 0:
@@ -65,7 +65,7 @@ def getData(param):
                 cursor.execute(select_sql)
                 results = cursor.fetchall()
                 if len(results) > 0:
-                    #     exit(0)
+                    # exit(0)
                     continue
 
                 price = detail_tree.xpath(
@@ -189,7 +189,7 @@ def getData(param):
                                 build_date,
                                 depreciation, car_park, check_in, requirement, total_house, house_update, duration,
                                 commission,
-                                company_price, total_price, other_price, remarks,summo_link)
+                                company_price, total_price, other_price, remarks, summo_link)
                 print(house_sql)
                 cursor.execute(house_sql)
 
@@ -260,7 +260,6 @@ def getData(param):
         continue
 
 
-
 if __name__ == '__main__':
     # db = pymysql.connect(host='192.168.56.100', user='root', password='root', database='summo')
     db = pymysql.connect(host='localhost', user='root', password='159629zxc', database='summo')
@@ -269,8 +268,8 @@ if __name__ == '__main__':
 
     params = {
     }
-    page = 1
-    while page < 10:
+    page = 50
+    while page < 100:
         getData(url + (str(page)))
         page += 1
     cursor.close()
